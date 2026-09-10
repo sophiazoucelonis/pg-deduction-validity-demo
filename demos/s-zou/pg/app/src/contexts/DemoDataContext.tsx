@@ -148,7 +148,10 @@ function inferComponentName(filename: string): string {
 
 async function fetchYamlFromBlob(url: string): Promise<Record<string, unknown> | null> {
   try {
-    const res = await fetch(url);
+    // no-store: GitHub Pages serves these YAMLs with cache-control max-age=600,
+    // which left the embedded iframe showing a stale screen for up to 10 min
+    // after a deploy. Always fetch the freshest copy.
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     const text = await res.text();
     const data = parseYaml(text);
@@ -166,7 +169,7 @@ async function fetchDemoFromBlob(owner: string, customer: string): Promise<Fetch
   if (!blobBase) return { sources: [], routes: [], copilots: [] };
   const base = `${blobBase.replace(/\/$/, "")}/${owner}/${customer}`;
 
-  const manifestRes = await fetch(`${base}/manifest.yaml`);
+  const manifestRes = await fetch(`${base}/manifest.yaml`, { cache: "no-store" });
   if (!manifestRes.ok) return { sources: [], routes: [], copilots: [] };
   const manifestText = await manifestRes.text();
   const manifest = (parseYaml(manifestText) as BlobManifest) ?? {};
