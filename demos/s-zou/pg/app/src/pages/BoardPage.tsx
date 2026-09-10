@@ -5,8 +5,10 @@
  * brand.name / framing / domain / title otherwise.
  */
 
+import { useMemo, type CSSProperties } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { BoardView } from "@/components/board/BoardView";
+import { renderComponent } from "@/components/board/registry";
 import { ComponentBoundary } from "@/components/board/ComponentBoundary";
 import { OverlayPanel } from "@/components/board/OverlayPanel";
 import { RouteContent } from "@/components/RouteContent";
@@ -143,6 +145,59 @@ export default function BoardPage({ data }: BoardPageProps) {
       return next;
     });
   };
+
+  // `?embed=1` — chromeless view for iframing: no IconSidebar, no top menu /
+  // breadcrumb bar, no package sidebar, no brand-hero, no hotspots. Just the
+  // orchestration engine filling the frame. Renders the single canvas
+  // component directly inside a flex-col viewport wrapper (bypassing AppLayout
+  // AND BoardView) — the OE root is `flex flex-1 min-h-0`, so it needs a
+  // flex-column parent with real height, which BoardView's full_canvas fast
+  // path (a plain block div) does not provide.
+  const isEmbed = searchParams.get("embed") === "1";
+  const embedComponent = useMemo(() => {
+    if (!isEmbed || data.view_kind !== "board") return null;
+    const all = [
+      ...(data.columns ?? []).flatMap((c) => c.components ?? []),
+      ...(data.column_groups ?? []).flatMap((g) =>
+        g.columns.flatMap((c) => c.components ?? []),
+      ),
+    ];
+    return (
+      all.find((c) => c.kind === "process-orchestration-flow") ??
+      all.find((c) => c.kind !== "brand-hero") ??
+      all[0] ??
+      null
+    );
+  }, [data, isEmbed]);
+
+  if (isEmbed) {
+    const brandStyle = data.brand
+      ? ({ "--brand-primary": data.brand.primary_color } as CSSProperties)
+      : undefined;
+    return (
+      <div
+        className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans"
+        style={brandStyle}
+      >
+        <ComponentBoundary
+          label={`screen:${data.id}`}
+          fallback={
+            <div className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
+              This screen couldn’t be rendered.
+            </div>
+          }
+        >
+          {embedComponent ? (
+            renderComponent(embedComponent, { brand: data.brand })
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              No component to display.
+            </div>
+          )}
+        </ComponentBoundary>
+      </div>
+    );
+  }
 
   return (
     <AppLayout
