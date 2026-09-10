@@ -8,3 +8,6 @@
 demos/**/app/node_modules
 demos/**/app/dist
 demos/**/_app-superseded-*
+
+# Ejected app local preview config
+demos/**/app/.claude/
