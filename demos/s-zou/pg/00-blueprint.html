@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deduction Validity App — Complete Solution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e8eef5;
+            padding-bottom: 20px;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #003DA5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            padding: 5px;
+        }
+        .header-text h1 {
+            font-size: 28px;
+            color: #003DA5;
+            margin-bottom: 8px;
+        }
+        .header-text p {
+            color: #666;
+            font-size: 14px;
+        }
+        .flow-container {
+            margin-top: 40px;
+        }
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+        .step-number {
+            min-width: 40px;
+            height: 40px;
+            background: #003DA5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex: 1;
+            padding: 16px;
+            background: #f9fafb;
+            border-left: 3px solid #003DA5;
+            border-radius: 6px;
+        }
+        .step-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+        .step-label {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .step-description {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .actor {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            background: #003DA5;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .actor.system {
+            background: #6366f1;
+        }
+        .actor.ai {
+            background: #10b981;
+        }
+        .actor.agent {
+            background: #f59e0b;
+        }
+        .arrow {
+            text-align: center;
+            color: #999;
+            font-size: 20px;
+            margin: -15px 0;
+            height: 20px;
+        }
+        .summary {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 6px;
+        }
+        .summary h3 {
+            color: #0284c7;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .summary p {
+            color: #0c4a6e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">P&G</div>
+            <div class="header-text">
+                <h1>Deduction Validity App — Complete Solution</h1>
+                <p>Primary Workflow: Remittance → Reconciliation → Deduction Coding → SAP Posting</p>
+            </div>
+        </div>
+
+        <div class="flow-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">Remittance received in AR Claims inbox</div>
+                    <div class="step-label">Status: Complete | Duration: Instant</div>
+                    <div class="step-description">A customer sends payment via email to the AR Claims inbox. This is the trigger that starts the entire workflow.</div>
+                    <div class="actor">Trigger / Outlook</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">Read email + attachments via MLWB</div>
+                    <div class="step-label">Status: Complete | Duration: 0.8s</div>
+                    <div class="step-description">Machine Learning Workbench extracts text, numbers, and structured data from the remittance email and any PDF attachments.</div>
+                    <div class="actor ai">AI / Celonis</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">Archive documents to SharePoint and Operational View</div>
+                    <div class="step-label">Status: Complete | Duration: Instant</div>
+                    <div class="step-description">Original documents are filed for audit, compliance, and regulatory purposes. Documents are linked to the invoice in the Operational View.</div>
+                    <div class="actor system">System / SharePoint</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">Ingest invoice data from SAP</div>
+                    <div class="step-label">Status: Complete | Duration: 1.2s</div>
+                    <div class="step-description">Pull the open invoice record from SAP including amount, due date, payment terms, and all line-item details.</div>
+                    <div class="actor system">System / SAP</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-title">Reconcile payment against open invoice</div>
+                    <div class="step-label">Status: Complete | Duration: 1.2s</div>
+                    <div class="step-description">Compare the payment received (from the remittance) with the invoice amount owed. This is where short-pays and overpayments surface.</div>
+                    <div class="actor system">System / Celonis</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <div class="step-title">Fetch pricing sheet and POD data from trackers</div>
+                    <div class="step-label">Status: Complete | Duration: 2.0s</div>
+                    <div class="step-description">If amounts don't match, retrieve the pricing tracker from SharePoint and check the Proof of Delivery (POD) status to understand why the gap exists.</div>
+                    <div class="actor system">System / SharePoint</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">7</div>
+                <div class="step-content">
+                    <div class="step-title">Determine reason code — D10 / C30 / C50 / A70 / D20</div>
+                    <div class="step-label">Status: Complete | Duration: 2.4s</div>
+                    <div class="step-description">
+                        The AI system decides which reason code applies:
+                        <ul style="margin: 8px 0 0 20px; font-size: 12px;">
+                            <li><strong>D10</strong>: Returns (customer returned goods)</li>
+                            <li><strong>C30</strong>: Pricing difference (price variance detected)</li>
+                            <li><strong>C50</strong>: Other deduction type</li>
+                            <li><strong>A70</strong>: Valid payment (clean POD, no issues)</li>
+                            <li><strong>D20</strong>: Pending POD (awaiting proof of delivery)</li>
+                        </ul>
+                    </div>
+                    <div class="actor ai">AI / Celonis</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">8</div>
+                <div class="step-content">
+                    <div class="step-title">Recommend deduction valid or invalid</div>
+                    <div class="step-label">Status: Current</div>
+                    <div class="step-description">The AI agent validates the deduction: Is this a legitimate deduction or potential revenue leakage? Flags suspicious patterns for manual review.</div>
+                    <div class="actor agent">Agent / Celonis</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">9</div>
+                <div class="step-content">
+                    <div class="step-title">Post cash application and deduction to SAP</div>
+                    <div class="step-label">Status: Pending | Duration: 1.6s</div>
+                    <div class="step-description">Write the decision back to SAP: post the cash application and the deduction with the determined reason code. Updates open item records.</div>
+                    <div class="actor system">System / SAP</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">10</div>
+                <div class="step-content">
+                    <div class="step-title">Email hand-off to CMO / PS action owners</div>
+                    <div class="step-label">Status: Pending</div>
+                    <div class="step-description">Notify the CMO (Chief Merchant Operations) or PS (Professional Services) team if manual action is needed — e.g., follow up on a return or investigate a pricing gap.</div>
+                    <div class="actor system">System / Outlook</div>
+                </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">11</div>
+                <div class="step-content">
+                    <div class="step-title">Send FBL5 report to AR team</div>
+                    <div class="step-label">Status: Pending</div>
+                    <div class="step-description">Daily FBL5 report (SAP open items list) is sent to the AR team showing all new postings and deductions from today's runs. Provides full audit trail and reconciliation.</div>
+                    <div class="actor system">System / Outlook</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h3>📊 Workflow Summary</h3>
+            <p><strong>Total Steps:</strong> 11 | <strong>Completed:</strong> 10 | <strong>Current:</strong> Step 8 (Validation)</p>
+            <p style="margin-top: 8px;"><strong>End-to-End Duration:</strong> ~12 minutes from remittance to SAP posting</p>
+            <p style="margin-top: 8px;"><strong>Key Automation:</strong> MLWB reads emails, AI determines codes, agent validates legitimacy, all decisions post to SAP automatically. No manual data entry.</p>
+        </div>
+    </div>
+</body>
+</html>

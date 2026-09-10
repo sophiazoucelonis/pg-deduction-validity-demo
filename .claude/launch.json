@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "atlas-demo",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "ATLAS_FOREGROUND=1 bash /Users/s.zou/.celoskills/marketplace-cache/plugins/atlas/bin/atlas-demo serve s-zou pg"],
+      "port": 8080
+    }
+  ]
+}

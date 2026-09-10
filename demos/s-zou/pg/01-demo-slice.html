@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Path — One Short-Paid Invoice</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e8eef5;
+            padding-bottom: 20px;
+        }
+        .logo {
+            width: 80px; height: 80px;
+            background: #003DA5;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px; font-weight: bold;
+        }
+        .header-text h1 { font-size: 28px; color: #003DA5; margin-bottom: 8px; }
+        .header-text p { color: #666; font-size: 14px; }
+        .case-banner {
+            background: #003DA5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .case-banner .case-id { font-weight: bold; font-size: 16px; }
+        .flow-container { margin-top: 20px; }
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            align-items: flex-start;
+        }
+        .step-number {
+            min-width: 40px; height: 40px;
+            background: #003DA5; color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px; flex-shrink: 0;
+        }
+        .step-number.gateway {
+            background: #f59e0b;
+            border-radius: 8px;
+            transform: rotate(45deg);
+        }
+        .step-number.gateway span { transform: rotate(-45deg); }
+        .step-number.converge { background: #8b5cf6; }
+        .step-number.skipped { background: #cbd5e1; }
+        .step-content {
+            flex: 1; padding: 16px;
+            background: #f9fafb;
+            border-left: 3px solid #003DA5;
+            border-radius: 6px;
+        }
+        .step-content.gateway { border-left-color: #f59e0b; background: #fffbeb; }
+        .step-content.converge { border-left-color: #8b5cf6; background: #faf5ff; }
+        .step-content.skipped { border-left-color: #cbd5e1; background: #f1f5f9; opacity: 0.6; }
+        .step-content.current { border-left-color: #10b981; background: #ecfdf5; box-shadow: 0 0 0 2px #10b981; }
+        .step-title { font-weight: 600; color: #1f2937; margin-bottom: 6px; font-size: 15px; }
+        .step-label { color: #666; font-size: 13px; margin-bottom: 4px; }
+        .step-description { color: #555; font-size: 13px; line-height: 1.5; }
+        .actor {
+            display: inline-block; margin-top: 8px;
+            padding: 4px 12px; color: white;
+            border-radius: 4px; font-size: 11px; font-weight: 600;
+            background: #003DA5;
+        }
+        .actor.system { background: #6366f1; }
+        .actor.ai { background: #10b981; }
+        .actor.agent { background: #f59e0b; }
+        .arrow { text-align: center; color: #999; font-size: 20px; margin: -8px 0; height: 20px; }
+        .branch-container {
+            display: flex;
+            gap: 20px;
+            margin-left: 60px;
+            margin-bottom: 24px;
+        }
+        .branch {
+            flex: 1;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .branch.taken { border-color: #10b981; border-style: solid; background: #f0fdf4; }
+        .branch.not-taken { background: #f8fafc; opacity: 0.65; }
+        .branch-label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .branch.taken .branch-label { background: #10b981; color: white; }
+        .branch.not-taken .branch-label { background: #cbd5e1; color: #475569; }
+        .mini-step {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #10b981;
+        }
+        .branch.not-taken .mini-step { border-left-color: #cbd5e1; }
+        .mini-step-title { font-weight: 600; font-size: 13px; color: #1f2937; }
+        .mini-step-desc { font-size: 12px; color: #666; margin-top: 4px; }
+        .summary {
+            margin-top: 30px; padding: 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 6px;
+        }
+        .summary h3 { color: #0284c7; margin-bottom: 10px; font-size: 14px; }
+        .summary p { color: #0c4a6e; font-size: 13px; line-height: 1.6; }
+        .demo-note {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">P&G</div>
+            <div class="header-text">
+                <h1>Demo Path — One Short-Paid Invoice</h1>
+                <p>The exact thread we'll walk together — remittance to SAP posting</p>
+            </div>
+        </div>
+
+        <div class="case-banner">
+            <span>Triggered by: Validate &amp; Post Deduction</span>
+            <span class="case-id">INV-4501873392</span>
+        </div>
+
+        <div class="flow-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">Remittance received — short-pay on INV-4501873392</div>
+                    <div class="step-label">Status: Complete | Duration: Instant</div>
+                    <div class="step-description">One remittance arrives on invoice INV-4501873392, showing a short payment. This is the specific case we'll walk through.</div>
+                    <div class="actor">Trigger / Outlook</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">MLWB reads email, extracts remittance and attachments</div>
+                    <div class="step-label">Status: Complete | Duration: 0.8s</div>
+                    <div class="step-description">Machine Learning Workbench pulls the payment amount and supporting documents from the remittance email.</div>
+                    <div class="actor ai">AI / Celonis</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">Archive documents to SharePoint</div>
+                    <div class="step-label">Status: Complete | Duration: Instant</div>
+                    <div class="step-description">The documents are filed to SharePoint for audit and compliance.</div>
+                    <div class="actor system">System / SharePoint</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">Fetch invoice and payment data from SAP</div>
+                    <div class="step-label">Status: Complete | Duration: 1.0s</div>
+                    <div class="step-description">Retrieve INV-4501873392's full details from SAP — amount owed, terms, and line items.</div>
+                    <div class="actor system">System / SAP</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-title">Reconcile payment received vs. invoice amount</div>
+                    <div class="step-label">Status: Complete | Duration: 1.2s</div>
+                    <div class="step-description">Compare what the customer paid against what was owed. The gap is identified here.</div>
+                    <div class="actor system">System / Celonis</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number gateway"><span>◆</span></div>
+                <div class="step-content gateway">
+                    <div class="step-title">DECISION: Invoice amount = payment received?</div>
+                    <div class="step-label">Exclusive Gateway | The fork in the road</div>
+                    <div class="step-description">This is the critical decision point. If amounts match, the invoice closes automatically. If short-paid, the deduction investigation begins.</div>
+                    <div class="actor system">System / Celonis</div>
+                </div>
+            </div>
+
+            <div class="branch-container">
+                <div class="branch not-taken">
+                    <div class="branch-label">✗ NOT TAKEN: Amounts match</div>
+                    <div class="mini-step">
+                        <div class="mini-step-title">Close fully-paid invoice — no deduction</div>
+                        <div class="mini-step-desc">This is what happens to fully-paid invoices: automatic exit, no AR team involvement, no deduction needed. Greyed because our demo invoice is short-paid.</div>
+                    </div>
+                </div>
+                <div class="branch taken">
+                    <div class="branch-label">✓ TAKEN: Short-paid</div>
+                    <div class="mini-step">
+                        <div class="mini-step-title">6. Check pricing sheet and POD tracker → CURRENT</div>
+                        <div class="mini-step-desc">Investigate why short. Pricing issue? POD rejection? (Duration: 2.1s)</div>
+                    </div>
+                    <div class="mini-step">
+                        <div class="mini-step-title">7. Determine reason code — D10/C30/C50/A70/D20</div>
+                        <div class="mini-step-desc">AI decides the code based on what the pricing/POD check found. (Duration: 2.4s)</div>
+                    </div>
+                    <div class="mini-step">
+                        <div class="mini-step-title">8. Recommend valid or invalid deduction</div>
+                        <div class="mini-step-desc">The agent flags whether this deduction is legitimate or potential revenue leakage.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number converge">◇</div>
+                <div class="step-content converge">
+                    <div class="step-title">Deduction outcome determined</div>
+                    <div class="step-label">Converge | Both paths merge here</div>
+                    <div class="step-description">Both branches (fully-paid exit and short-pay investigation) merge back together. The outcome for this invoice is now determined.</div>
+                    <div class="actor system">System / Celonis</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">9</div>
+                <div class="step-content">
+                    <div class="step-title">Post cash application and deduction to SAP</div>
+                    <div class="step-label">Status: Pending | Duration: 1.6s</div>
+                    <div class="step-description">Write the decision to SAP: post the cash application and the deduction with the determined reason code.</div>
+                    <div class="actor system">System / SAP</div>
+                </div>
+            </div>
+            <div class="arrow">↓</div>
+
+            <div class="step">
+                <div class="step-number">10</div>
+                <div class="step-content">
+                    <div class="step-title">Email hand-off and FBL5 report</div>
+                    <div class="step-label">Status: Pending</div>
+                    <div class="step-description">Notify the action owners and send the FBL5 report showing the new posting and deduction.</div>
+                    <div class="actor system">System / Outlook</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-note">
+            <strong>🎯 The key demo moment</strong> is steps 6–8 (the short-pay branch): this is where AI + agent validate the deduction and make the revenue-leakage call. The greyed "Amounts match" branch reminds the audience what <em>doesn't</em> need AR attention — fully-paid invoices exit automatically.
+        </div>
+
+        <div class="summary">
+            <h3>📊 Demo Path Summary</h3>
+            <p><strong>Case:</strong> INV-4501873392 (short-paid) | <strong>Path taken:</strong> Short-pay investigation</p>
+            <p style="margin-top: 8px;"><strong>Estimated Duration:</strong> ~4 minutes | <strong>Current step:</strong> Checking pricing &amp; POD</p>
+            <p style="margin-top: 8px;"><strong>Outcome:</strong> Short-pay gap validation — deduction legitimacy confirmed and posted to SAP.</p>
+        </div>
+    </div>
+</body>
+</html>
