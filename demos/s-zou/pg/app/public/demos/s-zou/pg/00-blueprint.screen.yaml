@@ -62,7 +62,7 @@ columns:
 
           - id: push-docs
             step_type: process
-            label: Push to SharePoint
+            label: Push to Operational View and SharePoint
             actor: system
             system: sharepoint
             status: complete
