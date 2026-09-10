@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/pg-deduction-validity-demo/celonis-logo.svg" />
+    <title>Celonis Atlas — Demo Prototype</title>
+    <meta name="description" content="React prototype rendering Celonis-style demo screens for pre-sales engagements." />
+    <meta name="author" content="Celonis Atlas" />
+    <!-- Boot loader — shown before main.tsx loads + React hydrates so the
+         user sees the Celonis loading animation immediately on a hard
+         refresh, just like the real product. Removed by main.tsx after
+         React mounts. -->
+    <style>
+      #pe-boot-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #pe-boot-loader svg { width: 129px; height: 75px; }
+      #pe-boot-loader .p1 { stroke: #c9d4f4; }
+      #pe-boot-loader .p2 { stroke: #6e9bf6; stroke-dasharray: 65; stroke-dashoffset: 80; animation: peb2 1.5s ease infinite; }
+      #pe-boot-loader .p3 { stroke: #4d7be6; stroke-dasharray: 55; stroke-dashoffset: 80; animation: peb3 1.5s ease infinite; }
+      #pe-boot-loader .p4 { stroke: #264aff; stroke-dasharray: 40; stroke-dashoffset: 80; animation: peb4 1.5s ease infinite; }
+      @keyframes peb2 { 0% { stroke-dashoffset: 65; } 100% { stroke-dashoffset: 195; } }
+      @keyframes peb3 { 0% { stroke-dashoffset: 55; } 100% { stroke-dashoffset: 165; } }
+      @keyframes peb4 { 0% { stroke-dashoffset: 40; } 100% { stroke-dashoffset: 120; } }
+    </style>
+    <script type="module" crossorigin src="/pg-deduction-validity-demo/assets/index-DBztWn3t.js"></script>
+    <link rel="stylesheet" crossorigin href="/pg-deduction-validity-demo/assets/index-8rJWbi9T.css">
+  </head>
+
+  <body>
+    <div id="pe-boot-loader" aria-label="Loading">
+      <svg viewBox="0 0 25 26" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
+          <path stroke-width="2" class="p1" d="M8.03874092,7.01517241 C4.04874092,9.82758621 1,10.1158621 1,14.8386207 C1,20.5296552 5.73389831,24.9075862 12.3489346,24.9075862 C18.8356174,24.9075862 23.6882082,19.6455172 23.702553,13.5641379 C23.7227119,7.67034483 19.6926877,1 14.8373366,1 C9.96887368,1 12.0180239,4.2103127 8.03874092,7.01517241 Z"/>
+          <path stroke-width="2" class="p2" d="M8.03874092,7.01517241 C4.04874092,9.82758621 1,10.1158621 1,14.8386207 C1,20.5296552 5.73389831,24.9075862 12.3489346,24.9075862 C18.8356174,24.9075862 23.6882082,19.6455172 23.7026283,13.5641379 C23.7227119,7.67034483 19.6926877,1 14.8373366,1 C14.8106184,1 14.7841086,1 14.7578051,1.00028947 C9.9992903,1.03516477 11.9893852,4.21486264 8.05888081,7.00093661"/>
+          <path stroke-width="2" class="p3" d="M8.03874092,7.01517241 C4.04874092,9.82758621 1,10.1158621 1,14.8386207 C1,20.5296552 5.73389831,24.9075862 12.3489346,24.9075862 C18.8356174,24.9075862 23.6882082,19.6455172 23.7026283,13.5641379 C23.7227119,7.67034483 19.6926877,1 14.8373366,1 C14.8106184,1 14.7841086,1 14.7578051,1.00028947 C9.9992903,1.03516477 11.9893852,4.21486264 8.05888081,7.00093661"/>
+          <path stroke-width="2" class="p4" d="M8.03874092,7.01517241 C4.04874092,9.82758621 1,10.1158621 1,14.8386207 C1,20.5296552 5.73389831,24.9075862 12.3489346,24.9075862 C18.8356174,24.9075862 23.6882082,19.6455172 23.7026283,13.5641379 C23.7227119,7.67034483 19.6926877,1 14.8373366,1 C14.8106184,1 14.7841086,1 14.7578051,1.00028947 C9.9992903,1.03516477 11.9893852,4.21486264 8.05888081,7.00093661"/>
+        </g>
+      </svg>
+    </div>
+    <div id="root"></div>
+  </body>
+</html>

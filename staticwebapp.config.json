@@ -1,0 +1,27 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/.auth/*",
+      "/api/*",
+      "/assets/*",
+      "/fonts/*",
+      "/cm-icons/*",
+      "/oe-icons/*",
+      "/*.{css,js,svg,png,jpg,jpeg,gif,webp,ico,woff,woff2,ttf,eot,map,txt}"
+    ]
+  },
+  "routes": [
+    { "route": "/*", "allowedRoles": ["authenticated"] }
+  ],
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/aad",
+      "statusCode": 302
+    },
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  }
+}
