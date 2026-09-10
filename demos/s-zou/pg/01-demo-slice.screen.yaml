@@ -20,18 +20,15 @@ hotspots:
   - selector: "[data-prep-id='process-orchestration-flow-step-gw-amount-match']"
     label: "The fork — invoice amount vs. payment amount. Match closes clean; short-pay goes to investigation"
     order: 3
-  - selector: "[data-prep-id='process-orchestration-flow-step-fetch-pricing-pod']"
-    label: "Pull the pricing tracker (SharePoint) and proof-of-delivery data — the evidence for the call"
-    order: 4
   - selector: "[data-prep-id='process-orchestration-flow-step-code-deduction']"
     label: "The critical step — which reason code? Pricing? POD issue? Return? We determine that here"
-    order: 5
+    order: 4
   - selector: "[data-prep-id='process-orchestration-flow-step-gw-deduction-outcome']"
     label: "The determination — valid or invalid? This is the revenue-leakage call"
-    order: 6
+    order: 5
   - selector: "[data-prep-id='process-orchestration-flow-step-post-to-sap']"
     label: "Close-out — post the cash application + deduction to SAP, then report to Product Supply/SMO"
-    order: 7
+    order: 6
 
 brand:
   name: Procter & Gamble
@@ -71,7 +68,7 @@ columns:
 
           - id: push-docs
             step_type: process
-            label: Push to Operational View and SharePoint
+            label: Push to SharePoint
             actor: system
             system: sharepoint
             status: complete
@@ -101,14 +98,6 @@ columns:
             system: sap
             status: skipped
             duration: "1.2s"
-
-          - id: fetch-pricing-pod
-            step_type: process
-            label: Fetch pricing sheet + POD data
-            actor: system
-            system: sharepoint
-            status: complete
-            duration: "2.1s"
 
           - id: code-deduction
             step_type: process
@@ -150,10 +139,9 @@ columns:
 
           # Fork — does the payment cover the invoice?
           - {from: gw-amount-match, to: post-cash-app, condition: "Yes — amounts match"}
-          - {from: gw-amount-match, to: fetch-pricing-pod, condition: "No - underpaid or overpaid"}
+          - {from: gw-amount-match, to: code-deduction, condition: "No - underpaid or overpaid"}
 
           # Short-pay investigation path
-          - {from: fetch-pricing-pod, to: code-deduction}
           - {from: code-deduction, to: gw-deduction-outcome}
 
           # Sequential close-out
@@ -161,7 +149,7 @@ columns:
           - {from: post-to-sap, to: send-reports}
 
         summary:
-          total_steps: 11
-          completed: 6
+          total_steps: 10
+          completed: 5
           eta: "~ 4 minutes"
           value_recovered: "Short-pay gap validation — deduction legitimacy confirmed"
