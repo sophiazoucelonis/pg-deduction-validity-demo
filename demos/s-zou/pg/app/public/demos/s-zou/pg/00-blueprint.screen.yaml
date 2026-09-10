@@ -14,14 +14,14 @@ hotspots:
   - selector: "[data-prep-id='process-orchestration-flow-step-remittance-received']"
     label: "Primary workflow — the end-to-end thread Screen 2 walks in detail"
     order: 1
+  - selector: "[data-prep-id='process-orchestration-flow-step-fetch-pricing-pod']"
+    label: "Gather the evidence — pricing tracker (SharePoint) + proof-of-delivery data"
+    order: 2
   - selector: "[data-prep-id='process-orchestration-flow-step-code-deduction']"
     label: "This is where Screen 2 zooms in — reason coding D10 / C30 / C50 / A70 / D20"
-    order: 2
-  - selector: "[data-prep-id='process-orchestration-flow-step-gw-fanout']"
-    label: "Around that thread run three supporting workflows — one integrated system"
     order: 3
-  - selector: "[data-prep-id='process-orchestration-flow-step-sec-classify']"
-    label: "The POD workflow resolves Pending-POD (D20) deductions the primary flow raised"
+  - selector: "[data-prep-id='process-orchestration-flow-step-send-reports']"
+    label: "Reporting hand-off — Alrecon, FBL5, Returns, Rejections feeds"
     order: 4
 
 brand:
@@ -35,7 +35,7 @@ columns:
         orientation: horizontal
 
       - kind: process-orchestration-flow
-        title: Deduction Validity App — Complete Solution (4 Workflows)
+        title: Deduction Validity App — Primary Workflow
 
         trigger:
           case_id: complete-solution
@@ -44,7 +44,6 @@ columns:
           triggered_at: "2026-09-08T00:00:00Z"
 
         steps:
-          # ---- Primary workflow spine (Screen 2 walks it in full detail) ----
           - id: remittance-received
             step_type: start
             label: Remittance received
@@ -53,21 +52,54 @@ columns:
             status: complete
             duration: instant
 
-          - id: ingest
+          - id: ingest-email
             step_type: process
-            label: Ingest email + remittance docs (MLWB)
+            label: Ingest email + remittance documents
             actor: ai
             system: celonis
             status: complete
             duration: "0.8s"
 
+          - id: push-docs
+            step_type: process
+            label: Push to SharePoint
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: instant
+
           - id: reconcile
             step_type: process
-            label: Reconcile payment vs. invoice
+            label: Reconcile invoices and payments
             actor: system
             system: celonis
             status: complete
             duration: "1.2s"
+
+          - id: gw-amount-match
+            step_type: gateway
+            subtype: exclusive
+            label: Invoice amount = payment amount?
+            actor: system
+            system: celonis
+            status: complete
+            duration: instant
+
+          - id: post-cash-app
+            step_type: process
+            label: Post cash app
+            actor: system
+            system: sap
+            status: skipped
+            duration: "1.2s"
+
+          - id: fetch-pricing-pod
+            step_type: process
+            label: Fetch pricing sheet + POD data
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: "0.6s"
 
           - id: code-deduction
             step_type: process
@@ -75,15 +107,18 @@ columns:
             actor: ai
             system: celonis
             status: current
+            duration: "2.4s"
 
-          - id: recommend-valid
-            step_type: process
-            label: Recommend valid or invalid
-            actor: agent
+          - id: gw-deduction-outcome
+            step_type: gateway
+            subtype: exclusive
+            label: Deduction outcome
+            actor: system
             system: celonis
             status: pending
+            duration: instant
 
-          - id: post-sap
+          - id: post-to-sap
             step_type: process
             label: Post cash app + deduction to SAP
             actor: system
@@ -91,114 +126,32 @@ columns:
             status: pending
             duration: "1.6s"
 
-          - id: email-handoff
+          - id: send-reports
             step_type: process
-            label: Email hand-off to Product Supply / SMO
-            actor: system
-            system: outlook
-            status: pending
-
-          # ---- Fan-out into the three supporting workflows ----
-          - id: gw-fanout
-            step_type: gateway
-            subtype: parallel
-            label: Supporting workflows
-            actor: system
-            status: pending
-
-          # ---- Secondary / POD workflow (resolves Pending-POD deductions) ----
-          - id: sec-ingest-pod
-            step_type: process
-            label: Ingest PODs — 2×/day (7AM & 3PM PHL)
-            actor: system
-            system: sharepoint
-            status: pending
-
-          - id: sec-match
-            step_type: process
-            label: "Match PODs to Code deduction's Pending-POD (D20) output"
-            actor: ai
-            system: celonis
-            status: pending
-
-          - id: sec-classify
-            step_type: process
-            label: Rejection → keep D20 · Clean POD → flag A70
-            actor: agent
-            system: celonis
-            status: pending
-
-          - id: sec-update-sap
-            step_type: process
-            label: Update deduction status in SAP
-            actor: system
-            system: sap
-            status: pending
-
-          # ---- Reporting workflow ----
-          - id: rep-review
-            step_type: process
-            label: Compile today's RA + postings (daily)
-            actor: system
-            system: celonis
-            status: pending
-
-          - id: rep-build
-            step_type: process
-            label: Build Alrecon (daily) · FBL5 (weekly) · Returns (weekly)
-            actor: system
-            system: celonis
-            status: pending
-
-          - id: rep-send
-            step_type: process
-            label: Send reports incl. Rejections (Tue/Thu) to AR + owners
-            actor: system
-            system: outlook
-            status: pending
-
-          # ---- Feeder workflows (keep SAP data current) ----
-          - id: feed-pull
-            step_type: process
-            label: Pull SAP data — Rejections · Returns · Alrecon
-            actor: system
-            system: sap
-            status: pending
-
-          - id: feed-build
-            step_type: process
-            label: "Build CSVs per feeder (Rejections: doc types DZ / 2A)"
-            actor: system
-            system: celonis
-            status: pending
-
-          - id: feed-email
-            step_type: process
-            label: "Email owners → refresh SAP data upstream of Reconcile"
+            label: Send to Alrecon, FBL5, Returns, Rejections
             actor: system
             system: outlook
             status: pending
 
         connections:
-          - {from: remittance-received, to: ingest}
-          - {from: ingest, to: reconcile}
-          - {from: reconcile, to: code-deduction}
-          - {from: code-deduction, to: recommend-valid}
-          - {from: recommend-valid, to: post-sap}
-          - {from: post-sap, to: email-handoff}
-          - {from: email-handoff, to: gw-fanout}
-          - {from: gw-fanout, to: sec-ingest-pod, condition: "Secondary / POD — 2×/day"}
-          - {from: sec-ingest-pod, to: sec-match}
-          - {from: sec-match, to: sec-classify}
-          - {from: sec-classify, to: sec-update-sap}
-          - {from: gw-fanout, to: rep-review, condition: "Reporting — daily / weekly"}
-          - {from: rep-review, to: rep-build}
-          - {from: rep-build, to: rep-send}
-          - {from: gw-fanout, to: feed-pull, condition: "Feeders — Tue·Thu / weekly / daily"}
-          - {from: feed-pull, to: feed-build}
-          - {from: feed-build, to: feed-email}
+          - {from: remittance-received, to: ingest-email}
+          - {from: ingest-email, to: push-docs}
+          - {from: push-docs, to: reconcile}
+          - {from: reconcile, to: gw-amount-match}
+
+          # Fork — does the payment cover the invoice?
+          - {from: gw-amount-match, to: post-cash-app, condition: "Yes — amounts match"}
+          - {from: gw-amount-match, to: fetch-pricing-pod, condition: "No - underpaid or overpaid"}
+
+          # Short-pay investigation path
+          - {from: fetch-pricing-pod, to: code-deduction}
+          - {from: code-deduction, to: gw-deduction-outcome}
+
+          # Sequential close-out
+          - {from: gw-deduction-outcome, to: post-to-sap, condition: "valid or invalid"}
+          - {from: post-to-sap, to: send-reports}
 
         summary:
-          total_steps: 18
-          completed: 3
-          eta: "End-to-end deduction system — 4 workflows"
+          total_steps: 11
+          completed: 6
+          eta: "Primary deduction workflow — end to end"
