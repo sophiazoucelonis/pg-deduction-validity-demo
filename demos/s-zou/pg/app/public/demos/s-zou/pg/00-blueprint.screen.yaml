@@ -1,0 +1,147 @@
+id: pg-deduction-validity-solution
+view_kind: board
+library_ref: null
+industry: retail_cpg
+framing: reduce_revenue_leakage_from_deductions
+domain: Accounts Receivable — Deductions
+title: Deduction Validity App — Complete Solution
+full_canvas: true
+
+generated_by: atlas-demo
+generated_at: "2026-09-08"
+
+hotspots:
+  - selector: "[data-prep-id='process-orchestration-flow-step-remittance-received']"
+    label: "Start here — remittances arrive in the AR Claims inbox, monitored continuously"
+    order: 1
+  - selector: "[data-prep-id='process-orchestration-flow-step-reconcile']"
+    label: "The payment gets reconciled against the open invoice — this is where short-pays surface"
+    order: 2
+  - selector: "[data-prep-id='process-orchestration-flow-step-code-deduction']"
+    label: "The heart: reason codes (D10 / C30 / C50 / A70 / D20) determined from remittance, pricing, POD"
+    order: 3
+  - selector: "[data-prep-id='process-orchestration-flow-step-post-sap']"
+    label: "Close the loop — cash application and deduction post back to SAP with the FBL5 report"
+    order: 4
+
+brand:
+  name: Procter & Gamble
+  primary_color: "#003DA5"
+  logo_url: "https://upload.wikimedia.org/wikipedia/commons/8/85/Procter_%26_Gamble_logo.svg"
+
+columns:
+  - components:
+      - kind: brand-hero
+        orientation: horizontal
+
+      - kind: process-orchestration-flow
+        title: Deduction Validity App — Primary Workflow
+
+        trigger:
+          case_id: remittance-flow
+          source_screen: "00-blueprint"
+          action_label: "Walk the complete solution"
+          triggered_at: "2026-09-08T00:00:00Z"
+
+        steps:
+          - id: remittance-received
+            step_type: start
+            label: Remittance received in AR Claims inbox
+            actor: trigger
+            system: outlook
+            status: complete
+            duration: instant
+
+          - id: ingest-clean
+            step_type: process
+            label: Read email + attachments via MLWB
+            actor: ai
+            system: celonis
+            status: complete
+            duration: "0.8s"
+
+          - id: archive-docs
+            step_type: process
+            label: Archive documents to SharePoint and Operational View
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: instant
+
+          - id: ingest-invoice
+            step_type: process
+            label: Ingest invoice data from SAP
+            actor: system
+            system: sap
+            status: complete
+            duration: "1.2s"
+
+          - id: reconcile
+            step_type: process
+            label: Reconcile payment against open invoice
+            actor: system
+            system: celonis
+            status: complete
+            duration: "1.2s"
+
+          - id: ingest-pricing-pod
+            step_type: process
+            label: Fetch pricing sheet and POD data from trackers
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: "2.0s"
+
+          - id: code-deduction
+            step_type: process
+            label: Determine reason code — D10 / C30 / C50 / A70 / D20
+            actor: ai
+            system: celonis
+            status: complete
+            duration: "2.4s"
+
+          - id: validate-deduction
+            step_type: process
+            label: Recommend deduction valid or invalid
+            actor: agent
+            system: celonis
+            status: current
+
+          - id: post-sap
+            step_type: process
+            label: Post cash application and deduction to SAP
+            actor: system
+            system: sap
+            status: pending
+            duration: "1.6s"
+
+          - id: email-handoff
+            step_type: process
+            label: Email hand-off to CMO / PS action owners
+            actor: system
+            system: outlook
+            status: pending
+
+          - id: fbl5-report
+            step_type: process
+            label: Send FBL5 report to AR team
+            actor: system
+            system: outlook
+            status: pending
+
+        connections:
+          - {from: remittance-received, to: ingest-clean}
+          - {from: ingest-clean, to: archive-docs}
+          - {from: archive-docs, to: ingest-invoice}
+          - {from: ingest-invoice, to: reconcile}
+          - {from: reconcile, to: ingest-pricing-pod}
+          - {from: ingest-pricing-pod, to: code-deduction}
+          - {from: code-deduction, to: validate-deduction}
+          - {from: validate-deduction, to: post-sap}
+          - {from: post-sap, to: email-handoff}
+          - {from: email-handoff, to: fbl5-report}
+
+        summary:
+          total_steps: 11
+          completed: 10
+          eta: "~ 12 minutes end-to-end"

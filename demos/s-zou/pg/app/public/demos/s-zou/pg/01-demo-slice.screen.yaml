@@ -1,0 +1,167 @@
+id: pg-deduction-validity-demo
+view_kind: board
+library_ref: null
+industry: retail_cpg
+framing: reduce_revenue_leakage_from_deductions
+domain: Accounts Receivable — Deductions
+title: Demo Path — One Short-Paid Invoice
+full_canvas: true
+
+generated_by: atlas-demo
+generated_at: "2026-09-08"
+
+hotspots:
+  - selector: "[data-prep-id='process-orchestration-flow-step-remittance-received']"
+    label: "Start here — a customer remittance lands in the AR Claims inbox"
+    order: 1
+  - selector: "[data-prep-id='process-orchestration-flow-step-ingest-email']"
+    label: "MLWB reads the email, extracts the remittance data and attachments"
+    order: 2
+  - selector: "[data-prep-id='process-orchestration-flow-step-gw-amount-match']"
+    label: "The fork — invoice amount vs. payment amount. Match closes clean; short-pay goes to investigation"
+    order: 3
+  - selector: "[data-prep-id='process-orchestration-flow-step-fetch-pricing-pod']"
+    label: "Pull the pricing tracker (SharePoint) and proof-of-delivery data — the evidence for the call"
+    order: 4
+  - selector: "[data-prep-id='process-orchestration-flow-step-code-deduction']"
+    label: "The critical step — which reason code? Pricing? POD issue? Return? We determine that here"
+    order: 5
+  - selector: "[data-prep-id='process-orchestration-flow-step-gw-deduction-outcome']"
+    label: "The determination — valid or invalid? This is the revenue-leakage call"
+    order: 6
+  - selector: "[data-prep-id='process-orchestration-flow-step-post-to-sap']"
+    label: "Close-out — post the cash application + deduction to SAP, then report to Product Supply/SMO"
+    order: 7
+
+brand:
+  name: Procter & Gamble
+  primary_color: "#003DA5"
+  logo_url: "https://upload.wikimedia.org/wikipedia/commons/8/85/Procter_%26_Gamble_logo.svg"
+
+columns:
+  - components:
+      - kind: brand-hero
+        orientation: horizontal
+
+      - kind: process-orchestration-flow
+        title: Demo Path — Deduction Validity for INV-4501873392
+
+        trigger:
+          case_id: "INV-4501873392"
+          source_screen: "00-blueprint"
+          action_label: "Validate & Post Deduction"
+          triggered_at: "2026-09-08T07:12:00Z"
+
+        steps:
+          - id: remittance-received
+            step_type: start
+            label: Remittance received
+            actor: trigger
+            system: outlook
+            status: complete
+            duration: instant
+
+          - id: ingest-email
+            step_type: process
+            label: Ingest email + remittance documents
+            actor: ai
+            system: celonis
+            status: complete
+            duration: "0.8s"
+
+          - id: push-docs
+            step_type: process
+            label: Push to Operational View and SharePoint
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: instant
+
+          - id: reconcile
+            step_type: process
+            label: Reconcile invoices and payments
+            actor: system
+            system: celonis
+            status: complete
+            duration: "1.2s"
+
+          - id: gw-amount-match
+            step_type: gateway
+            subtype: exclusive
+            label: Invoice amount = payment amount?
+            actor: system
+            system: celonis
+            status: complete
+            duration: instant
+
+          - id: post-cash-app
+            step_type: process
+            label: Post cash app
+            actor: system
+            system: sap
+            status: skipped
+            duration: "1.2s"
+
+          - id: fetch-pricing-pod
+            step_type: process
+            label: Fetch pricing sheet + POD data
+            actor: system
+            system: sharepoint
+            status: complete
+            duration: "2.1s"
+
+          - id: code-deduction
+            step_type: process
+            label: Code deduction
+            actor: ai
+            system: celonis
+            status: current
+            duration: "2.4s"
+
+          - id: gw-deduction-outcome
+            step_type: gateway
+            subtype: exclusive
+            label: Deduction outcome
+            actor: system
+            system: celonis
+            status: pending
+            duration: instant
+
+          - id: post-to-sap
+            step_type: process
+            label: Post cash app + deduction to SAP
+            actor: system
+            system: sap
+            status: pending
+            duration: "1.6s"
+
+          - id: send-reports
+            step_type: process
+            label: Send reports to PS/SMO
+            actor: system
+            system: outlook
+            status: pending
+
+        connections:
+          - {from: remittance-received, to: ingest-email}
+          - {from: ingest-email, to: push-docs}
+          - {from: push-docs, to: reconcile}
+          - {from: reconcile, to: gw-amount-match}
+
+          # Fork — does the payment cover the invoice?
+          - {from: gw-amount-match, to: post-cash-app, condition: "Yes — amounts match"}
+          - {from: gw-amount-match, to: fetch-pricing-pod, condition: "No - underpaid or overpaid"}
+
+          # Short-pay investigation path
+          - {from: fetch-pricing-pod, to: code-deduction}
+          - {from: code-deduction, to: gw-deduction-outcome}
+
+          # Sequential close-out
+          - {from: gw-deduction-outcome, to: post-to-sap, condition: "valid or invalid"}
+          - {from: post-to-sap, to: send-reports}
+
+        summary:
+          total_steps: 11
+          completed: 6
+          eta: "~ 4 minutes"
+          value_recovered: "Short-pay gap validation — deduction legitimacy confirmed"

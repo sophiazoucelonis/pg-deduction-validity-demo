@@ -1,0 +1,51 @@
+# Base Context Model — minimal skeleton injected for every customer that
+# doesn't declare its own context-model.yaml.
+id: base-context-model
+view_kind: board
+library_ref: null
+industry: other
+framing: operational_efficiency
+domain: "Process Intelligence"
+title: "Context Model"
+full_canvas: true
+
+columns:
+  - components:
+      - kind: context-model
+        title: "Context Model"
+        objects:
+          - id: order
+            displayName: "Order"
+            kind: transaction
+            fieldCount: 12
+            eventCount: 3
+          - id: item
+            displayName: "Item"
+            kind: transaction
+            fieldCount: 8
+            eventCount: 2
+          - id: vendor
+            displayName: "Vendor"
+            kind: master-data
+            fieldCount: 6
+          - id: material
+            displayName: "Material"
+            kind: master-data
+            fieldCount: 9
+
+        relationships:
+          - id: order-item
+            source: order
+            target: item
+            cardinality: ONE_TO_MANY
+            type: instance
+          - id: order-vendor
+            source: order
+            target: vendor
+            cardinality: MANY_TO_ONE
+            type: instance
+          - id: item-material
+            source: item
+            target: material
+            cardinality: MANY_TO_ONE
+            type: instance

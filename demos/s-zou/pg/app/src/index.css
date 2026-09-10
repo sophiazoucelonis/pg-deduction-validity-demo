@@ -1,0 +1,738 @@
+/* ----- Celonis Element button + menu (Emotion design system) -------
+ * Ported verbatim from `@celonis/emotion`'s ce-menu-common mixin and
+ * ce-button secondary variant. See:
+ *   libs/emotion/styles/core/mixins/_menu-common.scss
+ *   libs/emotion/src/lib/atoms/ce-button/styles/_ce-button.variants.scss
+ *
+ * The class names match real Celonis (.ce-menu-panel, .ce-menu-item,
+ * .ce-selected, .ce-button-secondary) so the DOM looks like the real
+ * product to anyone inspecting it.
+ */
+
+/* Icon-button trigger — ports the Emotion `ceIconButton variant="secondary"
+ * size="md"` directive. Square 32px×32px (size-8), 1px grey-40 border,
+ * 4px radius. Hover/active states match the canonical token map; the
+ * "selected" (= popup open) state uses surface-action-selected (light
+ * blue) bg, content-primary (blue-70) text, and border-primary-accented
+ * (blue-70) — NOT grey-100. Source:
+ *   libs/emotion/src/lib/atoms/ce-button/styles/_ce-button.variants.scss
+ *   libs/emotion/src/lib/atoms/ce-button/styles/_ce-button.sizes.scss
+ *   libs/emotion/src/lib/atoms/ce-button/ce-button.component.scss */
+.ce-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 8px;
+  background: var(--ce-surface-action, #ffffff);
+  border: 1px solid var(--ce-border, #b5b6c6);
+  border-radius: var(--ce-borderRadius-md, 4px);
+  /* Canonical Emotion boxShadow-sm — drops a soft navy-tinted shadow under
+   * secondary buttons. Two layers: a 3px Y-offset 4px blur, plus a 1px
+   * outline for crispness. */
+  box-shadow:
+    0 0.1875rem 0.25rem 0
+      oklch(from #0a1f4414 calc(l * calc(1 / 1)) 0.07494515 260.77799162 / 0.07843137),
+    0 0 0.0625rem 0
+      oklch(from #0a1f4414 calc(l * calc(1 / 1)) 0.07494515 260.77799162 / 0.07843137);
+  color: var(--ce-content-onAction, #0a1f44);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+}
+.ce-button-secondary:hover {
+  background: var(--ce-surface-action-hover, #fafafd);
+}
+.ce-button-secondary:active {
+  background: var(--ce-surface-action-active, #f1f0f5);
+}
+.ce-button-secondary[data-state="open"],
+.ce-button-secondary.ce-selected {
+  background: var(--ce-surface-action-selected, #e6efff);
+  color: var(--ce-content-primary, #264aff);
+  border-color: var(--ce-border-primary-accented, #264aff);
+}
+.ce-button-secondary:focus-visible {
+  outline: 2px solid var(--ce-content-primary, #264aff);
+  outline-offset: 2px;
+}
+/* Square icon variant — width forced to height (matches `.btn-icon` in
+ * the canonical SCSS). Used for the KPI selector. */
+.ce-button-secondary.ce-button-secondary--icon {
+  width: 32px;
+  padding: 0;
+}
+
+/* ce-button primary — ported from
+ *   libs/emotion/src/lib/atoms/ce-button/styles/_ce-button.variants.scss
+ * Tokens used:
+ *   bgColor: surface-action-primary  → palette-blue-70 (#264aff)
+ *   bgColor-hover: surface-action-primary-hover → blue-80 (#2140d9)
+ *   bgColor-active: surface-action-primary-active → blue-90 (#1933b9)
+ *   textColor: content-onActionInversed → palette-white (#ffffff)
+ *   borderColor: transparent
+ * Used for the primary CTA on cta-row (orchestration trigger). Matches the
+ * same height / radius / padding / shadow / font as ce-button-secondary so
+ * the two coexist on the same row. */
+.ce-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 12px;
+  background: var(--ce-surface-action-primary, #264aff);
+  border: 1px solid transparent;
+  border-radius: var(--ce-borderRadius-md, 4px);
+  box-shadow:
+    0 0.1875rem 0.25rem 0
+      oklch(from #0a1f4414 calc(l * calc(1 / 1)) 0.07494515 260.77799162 / 0.07843137),
+    0 0 0.0625rem 0
+      oklch(from #0a1f4414 calc(l * calc(1 / 1)) 0.07494515 260.77799162 / 0.07843137);
+  color: var(--ce-content-onActionInversed, #ffffff);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+}
+.ce-button-primary:hover {
+  background: var(--ce-surface-action-primary-hover, #2140d9);
+}
+.ce-button-primary:active {
+  background: var(--ce-surface-action-primary-active, #1933b9);
+}
+.ce-button-primary:focus-visible {
+  outline: 2px solid var(--ce-content-primary, #264aff);
+  outline-offset: 2px;
+}
+.ce-button-primary:disabled {
+  background: var(--ce-surface-action-primary-disabled, #b3c0ff);
+  cursor: not-allowed;
+}
+
+/* Menu panel — popover container. White surface, grey-30 (subdued)
+ * 1px border, 4px radius (md), boxShadow-md. */
+.ce-menu-panel {
+  background: var(--ce-surface-static, #ffffff);
+  border: 1px solid var(--ce-border-subdued, #d3d3dd);
+  border-radius: var(--ce-borderRadius-md, 4px);
+  box-shadow: 0 8px 10px 0 #0a1f4414;
+  min-width: 192px;
+  padding: 8px;
+}
+.ce-menu-panel__header {
+  padding: 4px 8px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ce-content, #0a1f44);
+  border-bottom: 1px solid var(--ce-border-subdued, #d3d3dd);
+  margin-bottom: 4px;
+}
+.ce-menu-panel__header__sub {
+  color: var(--ce-content-subdued, #606582);
+  font-size: 11px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* Menu item — option style. Default: white background, content text.
+ * Hover: surface-action-hover. Selected: surface-action-selected
+ * background + content-primary text + 2px primary bar on the left edge. */
+.ce-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--ce-borderRadius-md, 4px);
+  background: transparent;
+  color: var(--ce-content, #0a1f44);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.12s, color 0.12s;
+  margin-bottom: 2px;
+}
+.ce-menu-item:last-child { margin-bottom: 0; }
+.ce-menu-item:hover:not(.ce-selected):not(:disabled) {
+  background: var(--ce-surface-action-hover, #fafafd);
+}
+.ce-menu-item.ce-selected {
+  background: var(--ce-surface-action-selected, #e6efff);
+  color: var(--ce-content-primary, #264aff);
+  font-weight: 500;
+}
+.ce-menu-item.ce-selected::before {
+  content: "";
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-start: -4px;
+  width: 2px;
+  background: var(--ce-surface-action-primary, #264aff);
+  border-radius: 1px;
+}
+.ce-menu-item:disabled {
+  cursor: not-allowed;
+  color: var(--ce-content-disabled, #b5b6c6);
+}
+.ce-menu-item:focus-visible {
+  outline: 2px solid var(--ce-content-primary, #264aff);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* Pe lane fade-in — applied to lane SVG groups so they fade in smoothly
+ * when a lane is shown via the eventlog selector. CSS animations only
+ * play once per element instance, so existing lanes stay stable on
+ * re-renders; only newly mounted ones animate. */
+@keyframes peLaneFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.pe-lane-fade-in {
+  animation: peLaneFadeIn 0.32s ease-out;
+}
+
+/* ----- Celonis loading animation ------------------------------------
+ * Pixel-replica of real Celonis ce-loading. Four paths trace the same C
+ * outline at staggered stroke-dashoffsets to give the illusion of strokes
+ * drawing across the C. Colours come from semantic Celonis tokens with
+ * sensible blue-tier fallbacks.
+ */
+.ce-loading { display: inline-flex; align-items: center; justify-content: center; }
+.ce-loading--sm .ce-loading__svg { width: 43px; height: 25px; }
+.ce-loading--md .ce-loading__svg { width: 86px; height: 50px; }
+.ce-loading--lg .ce-loading__svg { width: 129px; height: 75px; }
+.ce-loading__path-1 { stroke: var(--ce-surface-static-accented, #c9d4f4); }
+.ce-loading__path-2 {
+  stroke: var(--ce-surface-static-info-hover, #6e9bf6);
+  stroke-dasharray: 65;
+  stroke-dashoffset: 80;
+  animation: ce-loading-path-2 1.5s ease infinite;
+}
+.ce-loading__path-3 {
+  stroke: var(--ce-surface-action-selected, #4d7be6);
+  stroke-dasharray: 55;
+  stroke-dashoffset: 80;
+  animation: ce-loading-path-3 1.5s ease infinite;
+}
+.ce-loading__path-4 {
+  stroke: var(--ce-surface-action-primary, #264aff);
+  stroke-dasharray: 40;
+  stroke-dashoffset: 80;
+  animation: ce-loading-path-4 1.5s ease infinite;
+}
+@keyframes ce-loading-path-2 { 0% { stroke-dashoffset: 65; } 100% { stroke-dashoffset: 195; } }
+@keyframes ce-loading-path-3 { 0% { stroke-dashoffset: 55; } 100% { stroke-dashoffset: 165; } }
+@keyframes ce-loading-path-4 { 0% { stroke-dashoffset: 40; } 100% { stroke-dashoffset: 120; } }
+
+/* Inter — local copies of the same files Celonis serves, instead of Google Fonts CDN. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Celonis ProductIcons — used by .icon-product-* / .icon-search / etc. */
+@font-face {
+  font-family: ProductIcons;
+  src: url('/fonts/icons.woff2') format('woff2'),
+       url('/fonts/icons.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Celonis5 — used by .ce-font-icon-* (chevrons, table glyphs, etc.) */
+@font-face {
+  font-family: Celonis5;
+  src: url('/fonts/celonis5-icons.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Celonis Design System — mirrored from emotion-core/src/tokens/css/core.css (V2.1)
+   Source of truth: <emotion-repo>/libs/emotion-core/src/tokens/
+   Approach: keep the inherited shadcn/ui CSS variable names; replace values with
+   Celonis Emotion equivalents so the template pages inherit Celonis colors.
+*/
+
+@layer base {
+  :root {
+    /* Surface */
+    --background: 0 0% 100%;            /* white — ce-surface-static */
+    --foreground: 222 75% 15%;          /* grey-100 #0a1f44 — ce-content */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 75% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 75% 15%;
+
+    /* Primary: structural dark navy (sidebar, header bg, primary text) — grey-100 */
+    --primary: 222 75% 15%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: subtle neutral surface — grey-20 #f1f0f5 */
+    --secondary: 240 10% 95%;
+    --secondary-foreground: 222 75% 15%;
+
+    /* Muted: same neutral, used for backgrounds */
+    --muted: 240 10% 95%;
+    --muted-foreground: 234 10% 40%;    /* alpha-grey-70 — subdued content */
+
+    /* Accent: Celonis brand blue — the highlight/CTA color (blue-70 #264aff) */
+    --accent: 230 100% 57%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive: red-80 #e12e2e */
+    --destructive: 0 75% 53%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success: green-100 #157757 */
+    --success: 162 70% 27%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning: orange-100 #b26000 */
+    --warning: 33 100% 35%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Info: blue-70 (matches accent) */
+    --info: 230 100% 57%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 234 15% 76%;              /* grey-40 #b5b6c6 — ce-border */
+    --input: 234 15% 76%;
+    --ring: 230 100% 57%;               /* focus ring uses brand blue */
+
+    /* Border radius — Celonis uses 4px (md) for cards/buttons */
+    --radius: 0.25rem;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 75% 25%;
+    --sidebar-primary: 230 100% 57%;    /* Celonis brand blue */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 95%;
+    --sidebar-accent-foreground: 222 75% 15%;
+    --sidebar-border: 234 15% 86%;
+    --sidebar-ring: 230 100% 57%;
+    --sidebar-muted: 234 10% 50%;
+    --sidebar-icon: 222 75% 15%;
+    --sidebar-hover: 240 10% 95%;
+    --sidebar-active: 230 100% 95%;     /* very light blue tint */
+    --sidebar-active-foreground: 230 100% 57%;
+
+    /* Chart palette: Celonis-derived */
+    --chart-1: 230 100% 57%;            /* blue */
+    --chart-2: 162 70% 35%;             /* green */
+    --chart-3: 33 100% 50%;             /* orange */
+    --chart-4: 290 80% 55%;             /* purple */
+    --chart-5: 192 75% 35%;             /* teal */
+
+    /* Shadows: navy-tinted, from Emotion ce-boxShadowColor (oklch from #0a1f4414) */
+    --shadow-sm: 0 1px 2px 0 hsl(222 75% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(222 75% 15% / 0.08), 0 2px 4px -2px hsl(222 75% 15% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(222 75% 15% / 0.08), 0 4px 6px -4px hsl(222 75% 15% / 0.05);
+    --shadow-card: 0 1px 3px 0 hsl(222 75% 15% / 0.08), 0 1px 2px -1px hsl(222 75% 15% / 0.08);
+
+    /* Font family — Emotion uses Inter (--ce-fontFamily-base: Inter) */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 193 100% 43%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 47% 15%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222 47% 18%;
+    --muted-foreground: 214 32% 65%;
+
+    --accent: 193 100% 43%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 69% 35%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 199 89% 42%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 193 100% 43%;
+
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 214 32% 75%;
+    --sidebar-primary: 193 100% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 47% 12%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 47% 15%;
+    --sidebar-ring: 193 100% 43%;
+    --sidebar-muted: 214 32% 50%;
+    --sidebar-icon: 0 0% 100%;
+    --sidebar-hover: 222 47% 12%;
+    --sidebar-active: 231 100% 57%;
+    --sidebar-active-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Inter is the canonical font across the entire Celonis UI. SVG <text>
+     elements don't always inherit font-family reliably across browsers, so
+     enforce it globally here. Never set fontFamily inline on <text> in
+     component code. */
+  svg text {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Celonis canonical color palette — used for process colors (lanes, charts,
+   anywhere a colored accent is needed). Numbering convention: -0 is lightest,
+   -100 is darkest. Add new palette families here as Celonis exposes them. */
+:root {
+  --process-palette-white: #ffffff;
+  --process-palette-black: #000000;
+
+  --process-palette-grey-0:   #fcfcfe;
+  --process-palette-grey-5:   #fbfbfd;
+  --process-palette-grey-10:  #fafafd;
+  --process-palette-grey-20:  #f1f0f5;
+  --process-palette-grey-30:  #d3d3dd;
+  --process-palette-grey-40:  #b5b6c6;
+  --process-palette-grey-50:  #989aaf;
+  --process-palette-grey-60:  #7c7f98;
+  --process-palette-grey-70:  #606582;
+  --process-palette-grey-80:  #454c6d;
+  --process-palette-grey-90:  #2a3558;
+  --process-palette-grey-100: #0a1f44;
+
+  --process-palette-blue-0:   #fafdff;
+  --process-palette-blue-5:   #f8fcff;
+  --process-palette-blue-10:  #f6fbff;
+  --process-palette-blue-20:  #d1e5ff;
+  --process-palette-blue-30:  #accefe;
+  --process-palette-blue-40:  #86b8fe;
+  --process-palette-blue-50:  #60a0fe;
+  --process-palette-blue-60:  #3787fd;
+  --process-palette-blue-70:  #264aff;
+  --process-palette-blue-80:  #2140d9;
+  --process-palette-blue-90:  #1933b9;
+  --process-palette-blue-100: #023683;
+
+  --process-palette-purple-0:   #fff5ff;
+  --process-palette-purple-5:   #ffeeff;
+  --process-palette-purple-10:  #ffe3ff;
+  --process-palette-purple-20:  #f2caff;
+  --process-palette-purple-30:  #e5b2ff;
+  --process-palette-purple-40:  #d899fe;
+  --process-palette-purple-50:  #ca7ffe;
+  --process-palette-purple-60:  #bc64fe;
+  --process-palette-purple-70:  #ac45fe;
+  --process-palette-purple-80:  #971ffd;
+  --process-palette-purple-90:  #7e09e4;
+  --process-palette-purple-100: #690abc;
+
+  --process-palette-teal-0:   #f2ffff;
+  --process-palette-teal-5:   #efffff;
+  --process-palette-teal-10:  #d1f8f9;
+  --process-palette-teal-20:  #adf3f5;
+  --process-palette-teal-30:  #61e6ea;
+  --process-palette-teal-40:  #4bd1d6;
+  --process-palette-teal-50:  #3ebdc1;
+  --process-palette-teal-60:  #31a8ad;
+  --process-palette-teal-70:  #249499;
+  --process-palette-teal-80:  #188185;
+  --process-palette-teal-90:  #0c6d72;
+  --process-palette-teal-100: #005b60;
+
+  --process-palette-brown-0:   #fff8ee;
+  --process-palette-brown-5:   #fff3e3;
+  --process-palette-brown-10:  #ffe5c1;
+  --process-palette-brown-20:  #ffd393;
+  --process-palette-brown-30:  #ffba4c;
+  --process-palette-brown-40:  #f2a600;
+  --process-palette-brown-50:  #dc9600;
+  --process-palette-brown-60:  #c78800;
+  --process-palette-brown-70:  #b67600;
+  --process-palette-brown-80:  #a56500;
+  --process-palette-brown-90:  #905400;
+  --process-palette-brown-100: #7a4304;
+
+  --process-palette-magenta-0:   #fff5ff;
+  --process-palette-magenta-5:   #feeeff;
+  --process-palette-magenta-10:  #fee3ff;
+  --process-palette-magenta-20:  #fdc5ff;
+  --process-palette-magenta-30:  #faa5ff;
+  --process-palette-magenta-40:  #f683fe;
+  --process-palette-magenta-50:  #f357fe;
+  --process-palette-magenta-60:  #ec0cfb;
+  --process-palette-magenta-70:  #d309e1;
+  --process-palette-magenta-80:  #ba0dc6;
+  --process-palette-magenta-90:  #a005ab;
+  --process-palette-magenta-100: #85078d;
+
+  /* Process colors — semantic layer used by Process Explorer (and any future
+     component that needs ordered, distinguishable lane/category colors).
+     `-10` is the default/primary saturated shade per process; `-20`, `-30`
+     etc. shift within the same family for emphasis or variations. Each maps
+     to a saturated tier of one palette family. */
+  --process-color-1-10: var(--process-palette-blue-70);     /* #264aff — Celonis brand blue */
+  --process-color-1-20: var(--process-palette-blue-80);
+  --process-color-1-30: var(--process-palette-blue-90);
+
+  --process-color-2-10: var(--process-palette-purple-70);   /* #ac45fe */
+  --process-color-2-20: var(--process-palette-purple-80);
+  --process-color-2-30: var(--process-palette-purple-90);
+
+  --process-color-3-10: var(--process-palette-magenta-50);  /* #f357fe */
+  --process-color-3-20: var(--process-palette-magenta-60);
+  --process-color-3-30: var(--process-palette-magenta-70);
+
+  --process-color-4-10: var(--process-palette-teal-70);     /* #249499 */
+  --process-color-4-20: var(--process-palette-teal-80);
+  --process-color-4-30: var(--process-palette-teal-90);
+
+  --process-color-5-10: var(--process-palette-brown-70);    /* #b67600 */
+  --process-color-5-20: var(--process-palette-brown-80);
+  --process-color-5-30: var(--process-palette-brown-90);
+}
+
+@layer base {
+
+  /* Typography scale */
+  h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  h4 {
+    @apply text-lg font-medium;
+  }
+}
+
+@layer components {
+  /* Celonis ProductIcons — base class + size variants, matches the real product CSS */
+  .product-icon {
+    display: inline-block;
+    font: 16px/1 ProductIcons;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+  }
+  .product-icon--20 { font-size: 20px; }
+  .product-icon--24 { font-size: 24px; }
+  .product-icon--32 { font-size: 32px; }
+
+  /* Glyph mappings from the Celonis ProductIcons spec (icon name → unicode point) */
+  .icon-open-panel-arrow-left::before        { content: "\f000"; }
+  .icon-open-panel-arrow-right::before       { content: "\f001"; }
+  .icon-edit::before                          { content: "\f002"; }
+  .icon-logout::before                        { content: "\f003"; }
+  .icon-search::before                        { content: "\f004"; }
+  .icon-overflow-menu-horizontal::before      { content: "\f006"; }
+  .icon-notification::before                  { content: "\f007"; }
+  .icon-user-policies::before                 { content: "\f008"; }
+  .icon-user-profile::before                  { content: "\f009"; }
+  .icon-lightbulb::before                     { content: "\f00a"; }
+  .icon-product-transformation-center::before { content: "\f00b"; }
+  .icon-product-task-mining::before           { content: "\f00c"; }
+  .icon-product-process-repository::before    { content: "\f00e"; }
+  .icon-product-process-analytics::before     { content: "\f00f"; }
+  .icon-product-machine-learning::before      { content: "\f010"; }
+  .icon-product-inbox::before                 { content: "\f011"; }
+  .icon-product-event-collection::before      { content: "\f012"; }
+  .icon-product-database::before              { content: "\f013"; }
+  .icon-product-app-store-filled::before      { content: "\f014"; }
+  .icon-product-celonis-studio::before        { content: "\f015"; }
+  .icon-product-action-engine::before         { content: "\f016"; }
+  .icon-product-business-views::before        { content: "\f017"; }
+  .icon-product-settings::before              { content: "\f018"; }
+  .icon-settings::before                      { content: "\f018"; }
+  .icon-warning-filled::before                { content: "\f01a"; }
+  .icon-celonis::before                       { content: "\f01b"; }
+  .icon-product-demo-gallery::before          { content: "\f01d"; }
+  .icon-product-forge::before                 { content: "\f01f"; }
+  .icon-product-rpa::before                   { content: "\f022"; }
+  .icon-product-workflows::before             { content: "\f024"; }
+  .icon-product-business-landscape::before    { content: "\f028"; }
+  .icon-product-knowledge-hub::before         { content: "\f029"; }
+  .icon-product-transformation-hub::before    { content: "\f02b"; }
+  .icon-product-process-designer::before      { content: "\f02f"; }
+  .icon-product-action-hub::before            { content: "\f030"; }
+
+  /* Celonis5 font — the second icon font, used for asset/view glyphs (board-*),
+     chevrons, table operations, status indicators, etc. */
+  .ce-font-icon {
+    display: inline-block;
+    font: 13px/1 Celonis5;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+  }
+  .ce-font-icon-lg { font-size: 16px; }
+
+  /* Celonis5 glyph mappings — only the ones we actually use right now. */
+  .ce-font-icon-board-general::before { content: "\f0fa"; }
+  .ce-font-icon-process::before       { content: "\f039"; }
+  .ce-font-icon-chevron-right::before { content: "\f017"; }
+  .ce-font-icon-chevron-left::before  { content: "\f019"; }
+
+  /* KPI Display - Large numbers like in Celonis dashboards */
+  .kpi-value {
+    @apply text-4xl font-semibold tracking-tight text-foreground;
+  }
+
+  .kpi-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  /* Status badges */
+  .badge-deployed {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/10 text-warning;
+  }
+
+  /* Tree navigation item */
+  .tree-item {
+    @apply flex items-center gap-2 px-3 py-1.5 text-sm rounded-md cursor-pointer transition-colors;
+    @apply hover:bg-secondary text-foreground;
+  }
+
+  .tree-item-active {
+    @apply bg-accent/10 text-accent border-l-2 border-accent;
+  }
+
+  /* Card hover effect */
+  .card-interactive {
+    @apply transition-all duration-200;
+    @apply hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  /* Sidebar icon button */
+  .sidebar-icon-btn {
+    @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors;
+    @apply text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+  }
+
+  .sidebar-icon-btn-active {
+    @apply bg-sidebar-accent text-sidebar-primary;
+  }
+}
+
+@layer utilities {
+  /* Gradient utilities */
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(193 100% 35%) 100%);
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(222 47% 28%) 100%);
+  }
+
+  /* Glass effect for overlays */
+  .glass {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
+
+  /* Focus ring consistent with Celonis */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+}
+
+/* Context Model detail panel slide-in */
+@keyframes detail-slide-in {
+  0% { opacity: 0; transform: translateX(16px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Copilot Studio animations */
+@keyframes cs-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cs-dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%           { transform: translateY(-4px); opacity: 1; }
+}

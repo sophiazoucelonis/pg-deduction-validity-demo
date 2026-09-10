@@ -3,3 +3,8 @@
 
 # Build / deploy artifacts
 *.zip
+
+# Ejected app build/deps
+demos/**/app/node_modules
+demos/**/app/dist
+demos/**/_app-superseded-*
