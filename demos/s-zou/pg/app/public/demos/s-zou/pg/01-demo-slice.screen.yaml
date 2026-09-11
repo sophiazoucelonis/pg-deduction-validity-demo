@@ -26,8 +26,8 @@ hotspots:
   - selector: "[data-prep-id='process-orchestration-flow-step-gw-deduction-outcome']"
     label: "The determination — valid or invalid? This is the revenue-leakage call"
     order: 5
-  - selector: "[data-prep-id='process-orchestration-flow-step-post-to-sap']"
-    label: "Close-out — post the cash application + deduction to SAP, then report to Product Supply/SMO"
+  - selector: "[data-prep-id='process-orchestration-flow-step-send-reports']"
+    label: "Close-out — report the validated deduction to Product Supply/SMO"
     order: 6
 
 brand:
@@ -83,6 +83,14 @@ columns:
             status: complete
             duration: instant
 
+          - id: post-cash-app
+            step_type: process
+            label: Post cash app
+            actor: system
+            system: sap
+            status: skipped
+            duration: "1.2s"
+
           - id: code-deduction
             step_type: process
             label: Code deduction
@@ -99,14 +107,6 @@ columns:
             system: celonis
             status: pending
             duration: instant
-
-          - id: post-to-sap
-            step_type: process
-            label: Post cash app + deduction to SAP
-            actor: system
-            system: sap
-            status: pending
-            duration: "1.6s"
 
           - id: send-reports
             step_type: process
@@ -127,13 +127,15 @@ columns:
           - {from: ingest-email, to: reconcile}
           - {from: reconcile, to: gw-amount-match}
 
-          # Short-pay investigation path
+          # Fork — does the payment cover the invoice?
+          - {from: gw-amount-match, to: post-cash-app, condition: "Yes — amounts match"}
           - {from: gw-amount-match, to: code-deduction, condition: "No - underpaid or overpaid"}
+
+          # Short-pay investigation path
           - {from: code-deduction, to: gw-deduction-outcome}
 
           # Sequential close-out
-          - {from: gw-deduction-outcome, to: post-to-sap, condition: "valid or invalid"}
-          - {from: post-to-sap, to: send-reports}
+          - {from: gw-deduction-outcome, to: send-reports, condition: "valid or invalid"}
           - {from: send-reports, to: send-fbln}
 
         summary:
