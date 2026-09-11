@@ -66,14 +66,6 @@ columns:
             status: complete
             duration: "0.8s"
 
-          - id: push-docs
-            step_type: process
-            label: Push to SharePoint
-            actor: system
-            system: sharepoint
-            status: complete
-            duration: instant
-
           - id: reconcile
             step_type: process
             label: Reconcile invoices and payments
@@ -90,14 +82,6 @@ columns:
             system: celonis
             status: complete
             duration: instant
-
-          - id: post-cash-app
-            step_type: process
-            label: Post cash app
-            actor: system
-            system: sap
-            status: skipped
-            duration: "1.2s"
 
           - id: code-deduction
             step_type: process
@@ -131,25 +115,29 @@ columns:
             system: outlook
             status: pending
 
+          - id: send-fbln
+            step_type: process
+            label: Send FBLN open items report
+            actor: system
+            system: outlook
+            status: pending
+
         connections:
           - {from: remittance-received, to: ingest-email}
-          - {from: ingest-email, to: push-docs}
-          - {from: push-docs, to: reconcile}
+          - {from: ingest-email, to: reconcile}
           - {from: reconcile, to: gw-amount-match}
 
-          # Fork — does the payment cover the invoice?
-          - {from: gw-amount-match, to: post-cash-app, condition: "Yes — amounts match"}
-          - {from: gw-amount-match, to: code-deduction, condition: "No - underpaid or overpaid"}
-
           # Short-pay investigation path
+          - {from: gw-amount-match, to: code-deduction, condition: "No - underpaid or overpaid"}
           - {from: code-deduction, to: gw-deduction-outcome}
 
           # Sequential close-out
           - {from: gw-deduction-outcome, to: post-to-sap, condition: "valid or invalid"}
           - {from: post-to-sap, to: send-reports}
+          - {from: send-reports, to: send-fbln}
 
         summary:
-          total_steps: 10
-          completed: 5
+          total_steps: 9
+          completed: 4
           eta: "~ 4 minutes"
           value_recovered: "Short-pay gap validation — deduction legitimacy confirmed"
