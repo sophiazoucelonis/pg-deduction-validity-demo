@@ -60,14 +60,6 @@ columns:
             status: complete
             duration: "0.8s"
 
-          - id: push-docs
-            step_type: process
-            label: Push to Operational View and SharePoint
-            actor: system
-            system: sharepoint
-            status: complete
-            duration: instant
-
           - id: reconcile
             step_type: process
             label: Reconcile invoices and payments
@@ -118,6 +110,13 @@ columns:
             status: pending
             duration: instant
 
+          - id: send-ps-smo
+            step_type: process
+            label: Send report to PS/SMO
+            actor: system
+            system: outlook
+            status: pending
+
           - id: post-to-sap
             step_type: process
             label: Post cash app + deduction to SAP
@@ -135,8 +134,7 @@ columns:
 
         connections:
           - {from: remittance-received, to: ingest-email}
-          - {from: ingest-email, to: push-docs}
-          - {from: push-docs, to: reconcile}
+          - {from: ingest-email, to: reconcile}
           - {from: reconcile, to: gw-amount-match}
 
           # Fork — does the payment cover the invoice?
@@ -148,10 +146,11 @@ columns:
           - {from: code-deduction, to: gw-deduction-outcome}
 
           # Sequential close-out
-          - {from: gw-deduction-outcome, to: post-to-sap, condition: "valid or invalid"}
+          - {from: gw-deduction-outcome, to: send-ps-smo, condition: "valid or invalid"}
+          - {from: send-ps-smo, to: post-to-sap}
           - {from: post-to-sap, to: send-reports}
 
         summary:
           total_steps: 11
-          completed: 6
+          completed: 5
           eta: "Primary deduction workflow — end to end"
